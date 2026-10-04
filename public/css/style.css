@@ -56,3 +56,31 @@ input[type="submit"] {
     padding: .375rem 1rem;
     margin-top: 10px;
 }
+.subtitle {
+    margin: 0 1rem 1rem 1rem;
+    color: #516f90;
+}
+
+.add-link {
+    display: inline-block;
+    margin: 0 1rem 1rem 1rem;
+    color: #0091ae;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+table.contacts {
+    width: calc(100% - 2rem);
+    margin: 0 1rem 2rem 1rem;
+    border-collapse: collapse;
+}
+
+table.contacts th, table.contacts td {
+    text-align: left;
+    padding: .6rem .5rem;
+    border-bottom: solid 1px lightgrey;
+}
+
+table.contacts th {
+    background: #f5f8fa;
+}

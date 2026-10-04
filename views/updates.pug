@@ -1,0 +1,23 @@
+doctype html
+html
+    head
+        title= title
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        link(rel="stylesheet", href="/css/style.css")
+    body
+        h1 Add a contact
+        .form-wrapper
+            form(action="/update-cobj" method="POST")
+                label First name
+                input(type="text" name="firstname" required)
+                label Last name
+                input(type="text" name="lastname")
+                label Email
+                input(type="text" name="email" required)
+                label Phone
+                input(type="text" name="phone")
+                label Company
+                input(type="text" name="company")
+                input(type="submit" value="Create contact")
+        p
+            a(href="/") &larr; Back to contacts

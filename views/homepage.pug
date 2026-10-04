@@ -1,0 +1,24 @@
+doctype html
+html
+    head
+        title= title
+        meta(name="viewport" content="width=device-width, initial-scale=1")
+        link(rel="stylesheet", href="/css/style.css")
+    body
+        h1 Contacts
+        p.subtitle Data pulled live from HubSpot through the CRM API.
+        a.add-link(href="/update-cobj") + Add a contact
+        table.contacts
+            thead
+                tr
+                    th Name
+                    th Email
+                    th Phone
+                    th Company
+            tbody
+                each contact in contacts
+                    tr
+                        td #{contact.properties.firstname} #{contact.properties.lastname}
+                        td= contact.properties.email
+                        td= contact.properties.phone
+                        td= contact.properties.company
