@@ -5,20 +5,31 @@ html
         meta(name="viewport" content="width=device-width, initial-scale=1")
         link(rel="stylesheet", href="/css/style.css")
     body
-        h1 Contacts
-        p.subtitle Data pulled live from HubSpot through the CRM API.
-        a.add-link(href="/update-cobj") + Add a contact
-        table.contacts
-            thead
-                tr
-                    th Name
-                    th Email
-                    th Phone
-                    th Company
-            tbody
-                each contact in contacts
+        header.topbar
+            div
+                h1 Inventory
+                p.subtitle #{items.length} items, pulled live from HubSpot through the CRM API
+            a.btn(href="/inventory/new") + Add item
+        main
+            table.items
+                thead
                     tr
-                        td #{contact.properties.firstname} #{contact.properties.lastname}
-                        td= contact.properties.email
-                        td= contact.properties.phone
-                        td= contact.properties.company
+                        th Name
+                        th SKU
+                        th Category
+                        th.num Qty
+                        th.num Unit price
+                tbody
+                    each item in items
+                        - var p = item.properties || {}
+                        tr
+                            td.name= p.name
+                            td
+                                if p.sku
+                                    span.tag= p.sku
+                            td= p.category
+                            td.num= p.quantity
+                            td.num= p.unit_price ? ('$' + p.unit_price) : ''
+                    else
+                        tr
+                            td.empty(colspan=5) No items yet. Use Add item to create your first one.

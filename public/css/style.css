@@ -1,86 +1,113 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&display=swap");
 
-body, * {
-    font-family: 'Roboto', sans-serif;
-    margin: 0;
-    padding: 0;
+:root {
+    --ink: #33475b;
+    --muted: #7c98b6;
+    --line: #dfe3eb;
+    --brand: #ff7a59;
+    --brand-dark: #e66a4b;
+    --bg: #f5f8fa;
+    --panel: #ffffff;
 }
 
-h1 {
-    margin: 1rem;
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: "Lexend", -apple-system, system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.5;
 }
 
-.cards {
+.topbar {
     display: flex;
     align-items: center;
-    justify-content: space-evenly;
-    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
 }
 
-.card {
-    flex-basis: 31%;
-    margin: 1rem 0.4rem;
-    padding: 1rem 0.4rem 2.5rem 0.4rem;
-    border: solid 1px lightgrey;
-    border-radius: 15px;
-    box-shadow: 3px 2px 6px lightgrey;
-}
+h1 { font-size: 1.6rem; font-weight: 700; }
+.subtitle { color: var(--muted); font-size: .9rem; margin-top: .15rem; }
 
-.card__email {
-    font-size: 1rem;
+main { padding: 2rem; max-width: 1000px; margin: 0 auto; }
+
+.btn {
+    display: inline-block;
+    background: var(--brand);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: .95rem;
+    padding: .6rem 1.1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
 }
+.btn:hover { background: var(--brand-dark); }
+.btn.ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+}
+.btn.submit { margin-top: 1.2rem; width: 100%; font-size: 1rem; padding: .7rem; }
+
+table.items {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+}
+table.items th, table.items td {
+    text-align: left;
+    padding: .85rem 1rem;
+    border-bottom: 1px solid var(--line);
+    font-size: .95rem;
+}
+table.items th {
+    background: var(--bg);
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: .72rem;
+    letter-spacing: .04em;
+}
+table.items tbody tr:last-child td { border-bottom: none; }
+table.items tbody tr:hover { background: #fafbfc; }
+td.name { font-weight: 600; }
+.num { text-align: right; }
+.tag {
+    display: inline-block;
+    background: #eaf0f6;
+    color: var(--ink);
+    padding: .15rem .5rem;
+    border-radius: 6px;
+    font-size: .82rem;
+}
+.empty { text-align: center; color: var(--muted); padding: 2.5rem 1rem; }
 
 .form-wrapper {
-    font-size: 18px;
-    max-width: 768px;
-    margin: 2rem auto;
+    background: var(--panel);
+    max-width: 480px;
+    margin: 0 auto;
     padding: 2rem;
-    border: solid 1px lightgrey;
-    border-radius: 15px;
-    box-shadow: 3px 2px 6px lightgrey;
+    border: 1px solid var(--line);
+    border-radius: 12px;
 }
-
-label, input {
-    margin-top: 5px;
+label { display: block; font-weight: 500; font-size: .9rem; margin-top: 1rem; }
+input[type="text"], input[type="number"] {
     display: block;
-    font-size: inherit;
+    width: 100%;
+    margin-top: .35rem;
+    padding: .6rem .7rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: .95rem;
 }
-
-input[type="text"] {
-    padding: .25rem;
-}
-
-input[type="submit"] {
-    background-color: lightgrey;
-    border: none;
-    padding: .375rem 1rem;
-    margin-top: 10px;
-}
-.subtitle {
-    margin: 0 1rem 1rem 1rem;
-    color: #516f90;
-}
-
-.add-link {
-    display: inline-block;
-    margin: 0 1rem 1rem 1rem;
-    color: #0091ae;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-table.contacts {
-    width: calc(100% - 2rem);
-    margin: 0 1rem 2rem 1rem;
-    border-collapse: collapse;
-}
-
-table.contacts th, table.contacts td {
-    text-align: left;
-    padding: .6rem .5rem;
-    border-bottom: solid 1px lightgrey;
-}
-
-table.contacts th {
-    background: #f5f8fa;
-}
+input:focus { outline: none; border-color: var(--brand); }
