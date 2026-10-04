@@ -1,5 +1,7 @@
 const express = require('express');
 const axios = require('axios');
+require('dotenv').config();
+
 const app = express();
 
 app.set('view engine', 'pug');
@@ -7,65 +9,53 @@ app.use(express.static(__dirname + '/public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// * Please DO NOT INCLUDE the private app access token in your repo. Don't do this practicum in your normal account.
-const PRIVATE_APP_ACCESS = '';
+// The private app access token is loaded from .env and is never committed to the repo.
+const PRIVATE_APP_ACCESS = process.env.PRIVATE_APP_ACCESS_TOKEN;
 
-// TODO: ROUTE 1 - Create a new app.get route for the homepage to call your custom object data. Pass this data along to the front-end and create a new pug template in the views folder.
+const HUBSPOT_API = 'https://api.hubapi.com';
+const headers = {
+    Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
+    'Content-Type': 'application/json'
+};
 
-// * Code for Route 1 goes here
-
-// TODO: ROUTE 2 - Create a new app.get route for the form to create or update new custom object data. Send this data along in the next route.
-
-// * Code for Route 2 goes here
-
-// TODO: ROUTE 3 - Create a new app.post route for the custom objects form to create or update your custom object data. Once executed, redirect the user to the homepage.
-
-// * Code for Route 3 goes here
-
-/** 
-* * This is sample code to give you a reference for how you should structure your calls. 
-
-* * App.get sample
-app.get('/contacts', async (req, res) => {
-    const contacts = 'https://api.hubspot.com/crm/v3/objects/contacts';
-    const headers = {
-        Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
-        'Content-Type': 'application/json'
-    }
+// ROUTE 1 - Homepage: read Contact records from the CRM and render them in a table.
+app.get('/', async (req, res) => {
+    const url = `${HUBSPOT_API}/crm/v3/objects/contacts?limit=50&properties=firstname,lastname,email,phone,company`;
     try {
-        const resp = await axios.get(contacts, { headers });
-        const data = resp.data.results;
-        res.render('contacts', { title: 'Contacts | HubSpot APIs', data });      
+        const resp = await axios.get(url, { headers });
+        const contacts = resp.data.results;
+        res.render('homepage', { title: 'Contacts | Integrating With HubSpot I', contacts });
     } catch (error) {
-        console.error(error);
+        console.error(error.response ? error.response.data : error.message);
+        res.status(500).send('Error loading contacts from HubSpot.');
     }
 });
 
-* * App.post sample
-app.post('/update', async (req, res) => {
-    const update = {
+// ROUTE 2 - Render the form used to create a new Contact record.
+app.get('/update-cobj', (req, res) => {
+    res.render('updates', { title: 'Add a contact | Integrating With HubSpot I' });
+});
+
+// ROUTE 3 - Create the Contact in HubSpot, then redirect back to the homepage.
+app.post('/update-cobj', async (req, res) => {
+    const newContact = {
         properties: {
-            "favorite_book": req.body.newVal
+            firstname: req.body.firstname,
+            lastname: req.body.lastname,
+            email: req.body.email,
+            phone: req.body.phone,
+            company: req.body.company
         }
-    }
-
-    const email = req.query.email;
-    const updateContact = `https://api.hubapi.com/crm/v3/objects/contacts/${email}?idProperty=email`;
-    const headers = {
-        Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
-        'Content-Type': 'application/json'
     };
-
-    try { 
-        await axios.patch(updateContact, update, { headers } );
-        res.redirect('back');
-    } catch(err) {
-        console.error(err);
+    const url = `${HUBSPOT_API}/crm/v3/objects/contacts`;
+    try {
+        await axios.post(url, newContact, { headers });
+        res.redirect('/');
+    } catch (error) {
+        console.error(error.response ? error.response.data : error.message);
+        res.status(500).send('Error creating the contact in HubSpot.');
     }
-
 });
-*/
 
-
-// * Localhost
+// Localhost
 app.listen(3000, () => console.log('Listening on http://localhost:3000'));
