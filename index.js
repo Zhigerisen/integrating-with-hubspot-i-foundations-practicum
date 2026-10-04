@@ -9,51 +9,62 @@ app.use(express.static(__dirname + '/public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// The private app access token is loaded from .env and is never committed to the repo.
+// Secrets and config are loaded from .env and are never committed to the repo.
 const PRIVATE_APP_ACCESS = process.env.PRIVATE_APP_ACCESS_TOKEN;
+// The custom object type id (e.g. "2-12345678"), kept in .env so the app stays portable.
+const OBJECT_TYPE = process.env.OBJECT_TYPE;
+
+// Validate required configuration at startup (fail fast with a clear message).
+if (!PRIVATE_APP_ACCESS || !OBJECT_TYPE) {
+    throw new Error('Missing config: set PRIVATE_APP_ACCESS_TOKEN and OBJECT_TYPE in your .env file (see README).');
+}
 
 const HUBSPOT_API = 'https://api.hubapi.com';
+const PROPERTIES = ['name', 'sku', 'category', 'quantity', 'unit_price'];
 const headers = {
     Authorization: `Bearer ${PRIVATE_APP_ACCESS}`,
     'Content-Type': 'application/json'
 };
 
-// ROUTE 1 - Homepage: read Contact records from the CRM and render them in a table.
+// ROUTE 1 - Homepage: read the custom object (Inventory Item) records and render them in a table.
 app.get('/', async (req, res) => {
-    const url = `${HUBSPOT_API}/crm/v3/objects/contacts?limit=50&properties=firstname,lastname,email,phone,company`;
+    const url = `${HUBSPOT_API}/crm/v3/objects/${OBJECT_TYPE}?limit=100&properties=${PROPERTIES.join(',')}`;
     try {
         const resp = await axios.get(url, { headers });
-        const contacts = resp.data.results;
-        res.render('homepage', { title: 'Contacts | Integrating With HubSpot I', contacts });
+        const items = resp.data.results || [];
+        res.render('homepage', { title: 'Inventory | Integrating With HubSpot I', items });
     } catch (error) {
-        console.error(error.response ? error.response.data : error.message);
-        res.status(500).send('Error loading contacts from HubSpot.');
+        console.error(error.response?.data || error.message);
+        res.status(500).send('Error loading inventory from HubSpot.');
     }
 });
 
-// ROUTE 2 - Render the form used to create a new Contact record.
-app.get('/update-cobj', (req, res) => {
-    res.render('updates', { title: 'Add a contact | Integrating With HubSpot I' });
+// ROUTE 2 - Render the form used to create a new Inventory Item record.
+app.get('/inventory/new', (req, res) => {
+    res.render('form', { title: 'Add inventory item | Integrating With HubSpot I' });
 });
 
-// ROUTE 3 - Create the Contact in HubSpot, then redirect back to the homepage.
-app.post('/update-cobj', async (req, res) => {
-    const newContact = {
+// ROUTE 3 - Create the custom object record in HubSpot, then redirect back to the homepage.
+app.post('/inventory/new', async (req, res) => {
+    const record = {
         properties: {
-            firstname: req.body.firstname,
-            lastname: req.body.lastname,
-            email: req.body.email,
-            phone: req.body.phone,
-            company: req.body.company
+            name: req.body.name,
+            sku: req.body.sku,
+            category: req.body.category,
+            quantity: req.body.quantity,
+            unit_price: req.body.unit_price
         }
     };
-    const url = `${HUBSPOT_API}/crm/v3/objects/contacts`;
+    const url = `${HUBSPOT_API}/crm/v3/objects/${OBJECT_TYPE}`;
     try {
-        await axios.post(url, newContact, { headers });
+        await axios.post(url, record, { headers });
         res.redirect('/');
     } catch (error) {
-        console.error(error.response ? error.response.data : error.message);
-        res.status(500).send('Error creating the contact in HubSpot.');
+        const status = error.response?.status;
+        console.error(error.response?.data || error.message);
+        if (status === 409) return res.status(409).send('An item with that unique value already exists.');
+        if (status === 400) return res.status(400).send('Invalid input - please check the fields and try again.');
+        res.status(500).send('Error creating the inventory item in HubSpot.');
     }
 });
 
